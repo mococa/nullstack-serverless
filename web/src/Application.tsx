@@ -1,0 +1,40 @@
+import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
+
+import Home from "./Home";
+import { AnotherRoute } from "./AnotherRoute";
+
+import "./Application.css";
+
+declare function Head(): NullstackNode;
+
+class Application extends Nullstack {
+  prepare({ page }: NullstackClientContext) {
+    page.locale = "pt-BR";
+  }
+
+  renderHead() {
+    return (
+      <head>
+        <link href="https://fonts.gstatic.com" rel="preconnect" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Crete+Round&family=Roboto&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+    );
+  }
+
+  render() {
+    return (
+      <main>
+        <Head />
+
+        <Home route="/" greeting="Nulla-chan te dá as boas vindas!" />
+
+        <AnotherRoute route="/another-route" />
+      </main>
+    );
+  }
+}
+
+export default Application;

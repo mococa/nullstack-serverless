@@ -1,0 +1,18 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "<img src='https://raw.githubusercontent.com/nullstack/nullstack/master/nullstack.png' height='60' alt='Nullstack' />",
+  "dependencies": {
+    "nullstack": "0.19.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node .production/server.js",
+    "dev": "npx nullstack start",
+    "build": "npx nullstack build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
