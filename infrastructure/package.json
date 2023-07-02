@@ -9,25 +9,24 @@
     "watch": "tsc -w",
     "cdk": "cdk",
     "synth": "cdk synth",
-
     "prebootstrap": "yarn synth",
     "bootstrap": "cdk bootstrap",
-
     "predeploy": "yarn bootstrap",
     "deploy": "cdk deploy --require-approval never",
-
     "destroy": "cdk destroy --force true",
-    
     "prereup": "yarn destroy",
-    "reup": "deploy"
+    "reup": "yarn deploy"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.0",
     "@types/node": "20.1.7",
     "aws-cdk": "2.82.0",
     "ts-node": "^10.9.1",
     "typescript": "~5.0.4"
   },
   "dependencies": {
+    "@vendia/serverless-express": "^4.10.4",
+    "adm-zip": "^0.5.10",
     "aws-cdk-lib": "2.82.0",
     "aws-serverless-express": "^3.4.0",
     "constructs": "^10.0.0",
