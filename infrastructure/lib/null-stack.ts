@@ -1,4 +1,8 @@
 /* ---------- External ---------- */
+import path from "path";
+import zipper from "adm-zip";
+
+/* ---------- CDK ---------- */
 import * as cdk from "aws-cdk-lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as s3deployment from "aws-cdk-lib/aws-s3-deployment";
@@ -6,33 +10,82 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigatewayv2";
 import { Construct } from "constructs";
 
+/* ---------- Types ---------- */
+import { NullStackCDK } from "./@types";
+
 /* ---------- Interfaces ---------- */
+interface Bucket {
+  /**
+   * Bucket resource ID
+   */
+  id: string;
+
+  /**
+   * Bucket name
+   */
+  name: string;
+}
+
 interface Props extends cdk.StackProps {
-  build_bucket_name: string;
-  public_bucket_name: string;
+  /**
+   * Bucket to host a zip file containing all the build assets
+   */
+  build_bucket: Bucket;
+
+  /**
+   * Bucket to host all the Nullstack public folder
+   */
+  public_bucket: Bucket;
+
+  /**
+   * Environment
+   *
+   * This is also used a suffix for the buckets ids and names
+   *
+   * Example: development, staging, production, etc.
+   */
   environment: string;
+
+  /**
+   * Nullstack application directory
+   *
+   * Directory of the Nullstack application already built
+   */
+  app_dir: string;
+
+  /**
+   * Nullstack application enviroment variables
+   */
+  app_env: Record<string, string>;
 }
 
 export class NullstackAppStack extends cdk.Stack {
   /* ---------- Helpers ---------- */
-  getBucket(
-    { name, bucket_name }: { name: string; bucket_name: string },
-    props: cdk.aws_s3.BucketProps
-  ): s3.IBucket {
-    try {
-      // Try to import the existing bucket
-      return s3.Bucket.fromBucketName(this, name, bucket_name);
-    } catch (error) {
-      // If importing fails, create a new bucket
-      return new s3.Bucket(this, name, props);
-    }
+  getBucket({
+    bucket_name,
+    resource_name,
+    environment,
+    ...props
+  }: NullStackCDK.GetBucket): s3.IBucket {
+    return new s3.Bucket(this, `${resource_name}-${environment}`, {
+      bucketName: `${bucket_name}-${environment}`,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      versioned: true,
+      ...props,
+    });
   }
+
+  public_s3_bucket: cdk.aws_s3.IBucket;
+  build_s3_bucket: cdk.aws_s3.IBucket;
+  lambda_function: cdk.aws_lambda.Function;
 
   constructor(scope: Construct, id: string, props: Props) {
     super(scope, id, props);
 
     /* ---------- Constants ---------- */
-    const { environment, build_bucket_name, public_bucket_name } = props;
+    const { environment, build_bucket, public_bucket, app_dir, app_env } =
+      props;
     const { asset } = s3deployment.Source;
 
     /* ----------
@@ -40,48 +93,45 @@ export class NullstackAppStack extends cdk.Stack {
      * --------- */
 
     // Public assets (cdn)
-    const public_bucket = this.getBucket(
-      {
-        bucket_name: public_bucket_name,
-        name: `Nullstack-App-Public-Bucket-${environment}`,
-      },
-      {
-        bucketName: `${public_bucket_name}-${environment}`,
-        publicReadAccess: true,
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
-        versioned: true,
-      }
-    );
+    this.public_s3_bucket = this.getBucket({
+      bucket_name: public_bucket.name,
+      resource_name: public_bucket.id,
+      environment,
+
+      // S3 props
+      publicReadAccess: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+      accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+    });
+
+    this.public_s3_bucket.grantPublicAccess();
 
     // Build assets (nullstack app)
-    const build_bucket = this.getBucket(
-      {
-        bucket_name: build_bucket_name,
-        name: `Nullstack-App-Build-Bucket-${environment}`,
-      },
-      {
-        bucketName: `${build_bucket_name}-${environment}`,
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
-        blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
-        versioned: true,
-      }
-    );
+    this.build_s3_bucket = this.getBucket({
+      bucket_name: build_bucket.name,
+      resource_name: build_bucket.id,
+      environment,
+
+      // S3 props
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+      accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+    });
 
     /* ----------
      * Buckets deployment
      * -------- */
 
     // Deploy public assets
-    new s3deployment.BucketDeployment(
+    const public_bucket_deployment = new s3deployment.BucketDeployment(
       this,
       `Nullstack-App-Public-Deployment-${environment}`,
       {
         sources: [
           // Getting nullstack public folder
-          asset(`../lambda/public`),
+          asset(path.join(app_dir, "public")),
 
           // Getting client.js and client.css
-          asset(`../lambda/.production`, {
+          asset(path.join(app_dir, ".production"), {
             exclude: [
               "client.css.map",
               "client.js.map",
@@ -90,23 +140,25 @@ export class NullstackAppStack extends cdk.Stack {
             ],
           }),
         ],
-        destinationBucket: public_bucket,
+        destinationBucket: this.public_s3_bucket,
       }
     );
 
     // Deploy build assets
-    new s3deployment.BucketDeployment(
+    const build_bucket_deployment = new s3deployment.BucketDeployment(
       this,
       `Nullstack-App-Build-Deployment-${environment}`,
       {
-        sources: [asset(`../lambda/nullstack-build.zip`)],
-        destinationBucket: build_bucket,
+        sources: [asset("nullstack-build.zip")],
+        destinationBucket: this.build_s3_bucket,
       }
     );
 
     /* ----------
      *  Lambdas
      * -------- */
+
+    const cdn = `https://${public_bucket.name}-${environment}.s3.${props.env?.region}.amazonaws.com`;
 
     // Create lambda that will the build bucket assets
     const lambda_function = new lambda.Function(
@@ -116,21 +168,20 @@ export class NullstackAppStack extends cdk.Stack {
         functionName: `nullstack-app-lambda-function-${environment}`,
         description: "Lambda function that runs nullstack and serves the app",
         runtime: lambda.Runtime.NODEJS_18_X,
-        code: lambda.Code.fromBucket(build_bucket, "build.zip"),
+        code: lambda.Code.fromBucket(this.build_s3_bucket, "build.zip"),
         timeout: cdk.Duration.seconds(10),
         handler: "index.handler",
         memorySize: 512,
         environment: {
-          NULLSTACK_PROJECT_NAME: "[dev] Web",
-          NULLSTACK_PROJECT_COLOR: "#D22365",
-          NULLSTACK_WORKER_CDN: public_bucket.bucketWebsiteUrl,
+          NULLSTACK_WORKER_CDN: cdn,
+          ...app_env,
           LAMBDA: "true",
         },
       }
     );
 
     // Grating permission to read the bucket
-    build_bucket.grantReadWrite(lambda_function);
+    this.build_s3_bucket.grantReadWrite(lambda_function);
 
     /* ----------
      * API Gateway
@@ -199,5 +250,13 @@ export class NullstackAppStack extends cdk.Stack {
       },
       authType: lambda.FunctionUrlAuthType.NONE,
     });
+
+    // Add dependencies
+    public_bucket_deployment.node.addDependency(this.public_s3_bucket);
+    build_bucket_deployment.node.addDependency(this.build_s3_bucket);
+    lambda_function.node.addDependency(
+      build_bucket_deployment,
+      public_bucket_deployment
+    );
   }
 }
