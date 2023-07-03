@@ -1,0 +1,29 @@
+section {
+  margin: 0 auto;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+}
+
+article {
+  display: flex;
+  flex-flow: column;
+}
+
+h1.title {
+  margin-top: 64px;
+
+  text-align: center;
+}
+
+img.lambda {
+  margin: 32px auto 0;
+
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  section {
+    flex-wrap: wrap;
+  }
+}

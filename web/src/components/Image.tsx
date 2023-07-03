@@ -1,8 +1,8 @@
-/* eslint-disable nullstack/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Nullstack, {
   ImgHTMLAttributes,
   NullstackClientContext,
-} from "nullstack";
+} from 'nullstack';
 
 type Props = ImgHTMLAttributes<HTMLImageElement>;
 
@@ -22,10 +22,10 @@ export class Image extends Nullstack<Props> {
       <img
         {...props}
         src={`${
-          project.cdn?.endsWith("/")
+          project.cdn?.endsWith('/')
             ? project.cdn.slice(0, -1)
-            : project.cdn || ""
-        }/${props.src.startsWith("/") ? props.src.slice(1) : props.src}`}
+            : project.cdn || ''
+        }/${props.src.startsWith('/') ? props.src.slice(1) : props.src}`}
       />
     );
   }

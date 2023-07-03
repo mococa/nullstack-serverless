@@ -1,15 +1,15 @@
-import Nullstack, { NullstackClientContext, NullstackNode } from "nullstack";
+import Nullstack, { NullstackClientContext, NullstackNode } from 'nullstack';
 
-import Home from "./Home";
-import { AnotherRoute } from "./AnotherRoute";
+import { Home } from './pages/Home';
+import { AnotherRoute } from './pages/AnotherRoute';
 
-import "./Application.css";
+import './Application.css';
 
 declare function Head(): NullstackNode;
 
 class Application extends Nullstack {
   prepare({ page }: NullstackClientContext) {
-    page.locale = "pt-BR";
+    page.locale = 'pt-BR';
   }
 
   renderHead() {
@@ -26,13 +26,13 @@ class Application extends Nullstack {
 
   render() {
     return (
-      <main>
+      <body>
         <Head />
 
         <Home route="/" greeting="Nulla-chan te dá as boas vindas!" />
 
-        <AnotherRoute route="/another-route" />
-      </main>
+        <AnotherRoute route="/another-route/:id" />
+      </body>
     );
   }
 }
