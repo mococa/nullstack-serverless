@@ -1,6 +1,6 @@
-import Nullstack, { NullstackServerContext } from "nullstack";
+import Nullstack, { NullstackServerContext } from 'nullstack';
 
-import "./Counter.css";
+import './Counter.css';
 
 interface SetCountProps {
   count: number;
@@ -35,7 +35,11 @@ class Counter extends Nullstack {
   }
 
   render() {
-    return <button onclick={this.increment}>this.count = {this.count}</button>;
+    return (
+      <button class="counter" onclick={this.increment}>
+        this.count = {this.count}
+      </button>
+    );
   }
 }
 

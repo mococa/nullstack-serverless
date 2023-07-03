@@ -1,0 +1,20 @@
+button.counter {
+  background-color: #be185d;
+  color: #fff;
+
+  cursor: pointer;
+  border: none;
+
+  transition: 200ms;
+
+  width: 100%;
+  max-width: 400px;
+
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin: 32px auto;
+}
+
+button.counter:hover {
+  filter: brightness(0.9);
+}
