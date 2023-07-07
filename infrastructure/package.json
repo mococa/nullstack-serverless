@@ -1,14 +1,32 @@
 {
-  "name": "infrastructure",
-  "version": "0.1.0",
-  "bin": {
-    "infrastructure": "src/index.ts"
+  "name": "nullstack-serverless",
+  "version": "0.0.1",
+  "description": "Nullstack construct for CDK",
+  "author": "mococa <luizfelipesmoureau@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/mococa/nullstack-serverless",
+  "repository": {
+    "url": "https://github.com/mococa/nullstack-serverless.git"
   },
+  "keywords": [
+    "nullstack",
+    "cdk",
+    "serverless",
+    "lambda",
+    "s3",
+    "bucket",
+    "ssr",
+    "ssg",
+    "spa"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "cdk": "cdk",
-    "synth": "cdk synth",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build",
     "prebootstrap": "yarn synth",
     "bootstrap": "cdk bootstrap",
     "predeploy": "yarn bootstrap",
@@ -19,17 +37,21 @@
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.0",
-    "@types/node": "20.1.7",
+    "@types/node": "^14.14.37",
     "aws-cdk": "2.82.0",
     "ts-node": "^10.9.1",
-    "typescript": "~5.0.4"
+    "typescript": "~4.4.2"
+  },
+  "peerDependencies": {
+    "aws-cdk": "2.82.0",
+    "aws-cdk-lib": "2.82.0",
+    "constructs": "^10.0.0"
   },
   "dependencies": {
     "@vendia/serverless-express": "^4.10.4",
     "adm-zip": "^0.5.10",
     "aws-cdk-lib": "2.82.0",
     "aws-serverless-express": "^3.4.0",
-    "constructs": "^10.0.0",
     "express": "^4.18.2",
     "source-map-support": "^0.5.21"
   }
