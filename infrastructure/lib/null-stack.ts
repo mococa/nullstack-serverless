@@ -26,7 +26,45 @@ interface Bucket {
   name: string;
 }
 
-interface Props extends cdk.StackProps {
+type SSG = {
+  build_type: "ssg";
+
+  /**
+   * Bucket to host all files generated in the SSG build
+   */
+  bucket: Bucket;
+
+  /**
+   * Built Nullstack application SSG directory
+   *
+   * Directory of the Nullstack application already built
+   *
+   * E.g: `path.join("..", "web", "ssg")`
+   */
+  build_dir: string;
+};
+
+type SPA = {
+  build_type: "spa";
+
+  /**
+   * Bucket to host all files generated in the SPA build
+   */
+  bucket: Bucket;
+
+  /**
+   * Built Nullstack application SPA directory
+   *
+   * Directory of the Nullstack application already built
+   *
+   * E.g: `path.join("..", "web", "spa")`
+   */
+  build_dir: string;
+};
+
+type SSR = {
+  build_type: "ssr";
+
   /**
    * Bucket to host a zip file containing all the build assets
    */
@@ -38,6 +76,17 @@ interface Props extends cdk.StackProps {
   public_bucket: Bucket;
 
   /**
+   * Nullstack application directory
+   *
+   * Directory with the Nullstack application already built
+   *
+   * E.g: `path.join("..", "web")`
+   */
+  app_dir: string;
+};
+
+type Props = cdk.StackProps & {
+  /**
    * Environment
    *
    * This is also used a suffix for the buckets ids and names
@@ -47,17 +96,10 @@ interface Props extends cdk.StackProps {
   environment: string;
 
   /**
-   * Nullstack application directory
-   *
-   * Directory of the Nullstack application already built
-   */
-  app_dir: string;
-
-  /**
    * Nullstack application enviroment variables
    */
   app_env: Record<string, string>;
-}
+} & (SSG | SSR | SPA);
 
 export class NullstackAppStack extends cdk.Stack {
   /* ---------- Helpers ---------- */
@@ -76,16 +118,35 @@ export class NullstackAppStack extends cdk.Stack {
     });
   }
 
+  /**
+   * Bucket for public nullstack assets
+   *
+   * For SSR, it hosts only the public folder
+   * For SSG, it hosts the entire build folder
+   */
   public_s3_bucket: cdk.aws_s3.IBucket;
+
+  /**
+   * Bucket for public nullstack assets
+   *
+   * For SSR, it hosts .production folder
+   * For SSG, it is the same as `public_s3_bucket`
+   */
   build_s3_bucket: cdk.aws_s3.IBucket;
+
+  /**
+   * Available only for SSR
+   *
+   * Lambda for running the SSR nullstack app
+   */
   lambda_function: cdk.aws_lambda.Function;
 
   constructor(scope: Construct, id: string, props: Props) {
     super(scope, id, props);
 
     /* ---------- Constants ---------- */
-    const { environment, build_bucket, public_bucket, app_dir, app_env } =
-      props;
+    const { environment, build_type, app_env } = props;
+
     const { asset } = s3deployment.Source;
 
     /* ----------
@@ -94,55 +155,73 @@ export class NullstackAppStack extends cdk.Stack {
 
     // Public assets (cdn)
     this.public_s3_bucket = this.getBucket({
-      bucket_name: public_bucket.name,
-      resource_name: public_bucket.id,
+      bucket_name:
+        build_type === "ssr" ? props.public_bucket.name : props.bucket.name,
+      resource_name:
+        build_type === "ssr" ? props.public_bucket.id : props.bucket.id,
       environment,
 
       // S3 props
       publicReadAccess: true,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
       accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+      websiteIndexDocument: build_type !== "ssr" ? "index.html" : undefined,
+      websiteErrorDocument: build_type === "ssg" ? "404.html" : undefined,
     });
 
     this.public_s3_bucket.grantPublicAccess();
 
-    // Build assets (nullstack app)
-    this.build_s3_bucket = this.getBucket({
-      bucket_name: build_bucket.name,
-      resource_name: build_bucket.id,
-      environment,
+    // Build assets (nullstack ssr app)
+    if (build_type === "ssr") {
+      this.build_s3_bucket = this.getBucket({
+        bucket_name: props.build_bucket.name,
+        resource_name: props.build_bucket.id,
+        environment,
 
-      // S3 props
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
-      accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
-    });
+        // S3 props
+        blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+        accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+      });
+    } else {
+      this.build_s3_bucket = this.public_s3_bucket;
+    }
 
     /* ----------
-     * Buckets deployment
+     * Bucket deployments
      * -------- */
 
     // Deploy public assets
+    const sources =
+      build_type === "ssr"
+        ? [
+            // Getting nullstack public folder
+            asset(path.join(props.app_dir, "public")),
+
+            // Getting client.js and client.css
+            asset(path.join(props.app_dir, ".production"), {
+              exclude: [
+                "client.css.map",
+                "client.js.map",
+                "server.js.map",
+                "server.js",
+              ],
+            }),
+          ]
+        : [
+            // Getting nullstack public folder
+            asset(props.build_dir),
+          ];
+
     const public_bucket_deployment = new s3deployment.BucketDeployment(
       this,
       `Nullstack-App-Public-Deployment-${environment}`,
-      {
-        sources: [
-          // Getting nullstack public folder
-          asset(path.join(app_dir, "public")),
-
-          // Getting client.js and client.css
-          asset(path.join(app_dir, ".production"), {
-            exclude: [
-              "client.css.map",
-              "client.js.map",
-              "server.js.map",
-              "server.js",
-            ],
-          }),
-        ],
-        destinationBucket: this.public_s3_bucket,
-      }
+      { sources, destinationBucket: this.public_s3_bucket }
     );
+
+    // Add dependencies
+    public_bucket_deployment.node.addDependency(this.public_s3_bucket);
+
+    if (build_type !== "ssr") return;
 
     // Deploy build assets
     const build_bucket_deployment = new s3deployment.BucketDeployment(
@@ -157,8 +236,7 @@ export class NullstackAppStack extends cdk.Stack {
     /* ----------
      *  Lambdas
      * -------- */
-
-    const cdn = `https://${public_bucket.name}-${environment}.s3.${props.env?.region}.amazonaws.com`;
+    const cdn = `https://${props.public_bucket.name}-${environment}.s3.${props.env?.region}.amazonaws.com`;
 
     // Create lambda that will the build bucket assets
     const lambda_function = new lambda.Function(
@@ -174,6 +252,7 @@ export class NullstackAppStack extends cdk.Stack {
         memorySize: 512,
         environment: {
           NULLSTACK_WORKER_CDN: cdn,
+          NULLSTACK_PUBLIC_CDN: cdn,
           ...app_env,
           LAMBDA: "true",
         },
@@ -252,7 +331,6 @@ export class NullstackAppStack extends cdk.Stack {
     });
 
     // Add dependencies
-    public_bucket_deployment.node.addDependency(this.public_s3_bucket);
     build_bucket_deployment.node.addDependency(this.build_s3_bucket);
     lambda_function.node.addDependency(
       build_bucket_deployment,
