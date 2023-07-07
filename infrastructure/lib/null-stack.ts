@@ -10,14 +10,13 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigatewayv2";
 import { Construct } from "constructs";
 
-/* ---------- Types ---------- */
+/* ---------- Interfaces ---------- */
 interface GetBucket extends s3.BucketProps {
   bucket_name: string;
   resource_name: string;
   environment: string;
 }
 
-/* ---------- Interfaces ---------- */
 interface Bucket {
   /**
    * Bucket resource ID
@@ -30,6 +29,7 @@ interface Bucket {
   name: string;
 }
 
+/* ---------- Types ---------- */
 type SSG = {
   build_type: "ssg";
 
