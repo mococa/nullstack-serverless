@@ -19,9 +19,9 @@
     "ssg",
     "spa"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src",
+  "module": "dist/src",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
