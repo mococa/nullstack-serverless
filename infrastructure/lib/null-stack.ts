@@ -11,7 +11,11 @@ import * as apigateway from "aws-cdk-lib/aws-apigatewayv2";
 import { Construct } from "constructs";
 
 /* ---------- Types ---------- */
-import { NullStackCDK } from "./@types";
+interface GetBucket extends s3.BucketProps {
+  bucket_name: string;
+  resource_name: string;
+  environment: string;
+}
 
 /* ---------- Interfaces ---------- */
 interface Bucket {
@@ -108,7 +112,7 @@ export class NullstackAppStack extends cdk.Stack {
     resource_name,
     environment,
     ...props
-  }: NullStackCDK.GetBucket): s3.IBucket {
+  }: GetBucket): s3.IBucket {
     return new s3.Bucket(this, `${resource_name}-${environment}`, {
       bucketName: `${bucket_name}-${environment}`,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
