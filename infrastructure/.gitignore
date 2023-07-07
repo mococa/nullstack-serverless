@@ -4,8 +4,9 @@
 *.d.ts
 node_modules
 
-# CDK asset staging directory
 .cdk.staging
 cdk.out
 nullstack-build
 nullstack-build.zip
+dist
+yarn-error.log
