@@ -14,18 +14,19 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "14"
           registry-url: "https://registry.npmjs.org"
 
       - name: Install Dependencies
+        working-directory: infrastructure
         run: yarn install
 
       - name: Build
+        working-directory: infrastructure
         run: yarn run build
 
       - name: Publish package on NPM
-        run: |
-          cd infrastructure
-          npm publish
+        working-directory: infrastructure
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
