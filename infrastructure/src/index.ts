@@ -3,7 +3,7 @@ import {
   AppBucket,
   BuildType as StackBuildType,
   StackProps as Props,
-} from "../lib/null-stack";
+} from "../lib/nullstack-construct";
 
 import { zip_nullstack } from "../utils/zip_nullstack";
 
