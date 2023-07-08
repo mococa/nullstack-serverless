@@ -1,4 +1,16 @@
-import { NullstackAppStack } from "../lib/null-stack";
+import {
+  NullstackAppConstruct,
+  AppBucket,
+  BuildType as StackBuildType,
+  StackProps as Props,
+} from "../lib/null-stack";
+
 import { zip_nullstack } from "../utils/zip_nullstack";
 
-export { NullstackAppStack, zip_nullstack };
+export namespace NullstackProps {
+  export type NullstackAppBucket = AppBucket;
+  export type BuildType = StackBuildType;
+  export type StackProps = Props;
+}
+
+export { zip_nullstack, NullstackAppConstruct };

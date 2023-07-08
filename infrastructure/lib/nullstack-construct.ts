@@ -17,7 +17,7 @@ interface GetBucket extends s3.BucketProps {
   environment: string;
 }
 
-interface Bucket {
+export interface AppBucket {
   /**
    * Bucket resource ID
    */
@@ -36,7 +36,7 @@ type SSG = {
   /**
    * Bucket to host all files generated in the SSG build
    */
-  bucket: Bucket;
+  bucket: AppBucket;
 
   /**
    * Built Nullstack application SSG directory
@@ -54,7 +54,7 @@ type SPA = {
   /**
    * Bucket to host all files generated in the SPA build
    */
-  bucket: Bucket;
+  bucket: AppBucket;
 
   /**
    * Built Nullstack application SPA directory
@@ -72,12 +72,12 @@ type SSR = {
   /**
    * Bucket to host a zip file containing all the build assets
    */
-  build_bucket: Bucket;
+  build_bucket: AppBucket;
 
   /**
    * Bucket to host all the Nullstack public folder
    */
-  public_bucket: Bucket;
+  public_bucket: AppBucket;
 
   /**
    * Nullstack application directory
@@ -89,7 +89,9 @@ type SSR = {
   app_dir: string;
 };
 
-type Props = cdk.StackProps & {
+export type BuildType = SSG | SSR | SPA;
+
+export type StackProps = BuildType & {
   /**
    * Environment
    *
@@ -100,12 +102,19 @@ type Props = cdk.StackProps & {
   environment: string;
 
   /**
+   * Region
+   *
+   * Example: "sa-east-1"
+   */
+  region: string;
+
+  /**
    * Nullstack application enviroment variables
    */
   app_env: Record<string, string>;
-} & (SSG | SSR | SPA);
+} & BuildType;
 
-export class NullstackAppStack extends cdk.Stack {
+export class NullstackAppConstruct extends Construct {
   /* ---------- Helpers ---------- */
   getBucket({
     bucket_name,
@@ -145,8 +154,8 @@ export class NullstackAppStack extends cdk.Stack {
    */
   lambda_function: cdk.aws_lambda.Function;
 
-  constructor(scope: Construct, id: string, props: Props) {
-    super(scope, id, props);
+  constructor(scope: Construct, id: string, props: StackProps) {
+    super(scope, id);
 
     /* ---------- Constants ---------- */
     const { environment, build_type, app_env } = props;
@@ -240,7 +249,7 @@ export class NullstackAppStack extends cdk.Stack {
     /* ----------
      *  Lambdas
      * -------- */
-    const cdn = `https://${props.public_bucket.name}-${environment}.s3.${props.env?.region}.amazonaws.com`;
+    const cdn = `https://${props.public_bucket.name}-${environment}.s3.${props.region}.amazonaws.com`;
 
     // Create lambda that will the build bucket assets
     const lambda_function = new lambda.Function(
