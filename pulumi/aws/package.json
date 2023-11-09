@@ -10,6 +10,7 @@
     "type": "git",
     "directory": "pulumi/aws"
   },
+  "private": false,
   "keywords": [
     "nullstack",
     "pulumi",
