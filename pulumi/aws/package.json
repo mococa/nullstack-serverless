@@ -11,6 +11,10 @@
     "directory": "pulumi/aws"
   },
   "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "keywords": [
     "nullstack",
     "pulumi",
