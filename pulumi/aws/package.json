@@ -14,7 +14,8 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
-    "@mococa:registry": "https://npm.pkg.github.com"
+    "@mococa:registry": "https://npm.pkg.github.com",
+    "@nullstack-serverless:registry": "https://npm.pkg.github.com"
   },
   "keywords": [
     "nullstack",
