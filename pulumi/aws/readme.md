@@ -32,6 +32,11 @@ const environment = getStack(); // development, staging, production...
 /* ---------- Constants ---------- */
 const my_nullstack_app_dir = path.join(__dirname, "..", "my-nullstack-app");
 
+/* ---------- Handlers ---------- */
+compressSSRNullstackApps([my_nullstack_app_dir]).then(() => {
+  console.log("zipped nullstack apps.");
+});
+
 /* ---------- Resources ---------- */
 const nullstack_app = new PulumiNullstack("my-amazing-nullstack-app", {
   environment,
