@@ -3,13 +3,13 @@
 ## Installation
 
 ```bash
-npm install @nullstack-serverless/pulumi-aws
+npm install nullstack-serverless-pulumi-aws
 ```
 
 or
 
 ```bash
-yarn add @nullstack-serverless/pulumi-aws
+yarn add nullstack-serverless-pulumi-aws
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ import {
   PulumiNullstack,
   ServerlessApp,
   compressSSRNullstackApps,
-} from "@nullstack-serverless/pulumi-aws";
+} from "nullstack-serverless-pulumi-aws";
 
 /* ---------- Environment ---------- */
 const environment = getStack(); // development, staging, production...
