@@ -3,7 +3,7 @@ name: Publish to NPM
 on:
   push:
     paths:
-      - "infrastructure/package.json"
+      - "pulumi/aws/package.json"
     branches:
       - main
 
@@ -20,16 +20,16 @@ jobs:
           node-version: "16.14.0"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Install CDK Dependencies
-        working-directory: infrastructure
+      - name: Install Pulumi AWS Dependencies
+        working-directory: pulumi/aws
         run: yarn install
 
-      - name: Build CDK package
-        working-directory: infrastructure
+      - name: Build Pulumi AWS package
+        working-directory: pulumi/aws
         run: yarn run build
 
-      - name: Publish CDK package on NPM
-        working-directory: infrastructure
+      - name: Publish Pulumi AWS package on NPM
+        working-directory: pulumi/aws
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
