@@ -1,6 +1,6 @@
 {
-  "name": "@nullstack-serverless/pulumi-aws",
-  "version": "0.0.2",
+  "name": "nullstack-serverless-pulumi-aws",
+  "version": "0.0.1",
   "description": "Nullstack Pulumi class",
   "author": "mococa <luizfelipesmoureau@gmail.com>",
   "license": "MIT",
@@ -11,9 +11,6 @@
     "directory": "pulumi/aws"
   },
   "private": false,
-  "publishConfig": {
-    "@nullstack-serverless:registry": "https://npm.pkg.github.com"
-  },
   "keywords": [
     "nullstack",
     "pulumi",

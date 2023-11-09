@@ -31,9 +31,7 @@ jobs:
 
       - name: Publish Pulumi AWS package on NPM
         working-directory: pulumi/aws
-        run: |
-          npm config set '//npm.pkg.github.com/:_authToken' ${{ secrets.GITHUB_TOKEN }}
-          npm publish --access public
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
