@@ -18,7 +18,7 @@ export async function compressSSRNullstackApps(app_dirs: string[]) {
     __dirname,
     "..",
     "..",
-    "node_modules",
+    "..",
     "@vendia",
     "serverless-express"
   );
