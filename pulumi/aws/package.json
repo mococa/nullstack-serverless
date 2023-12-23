@@ -1,6 +1,6 @@
 {
   "name": "nullstack-serverless-pulumi-aws",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Nullstack Pulumi class",
   "author": "mococa <luizfelipesmoureau@gmail.com>",
   "license": "MIT",
@@ -40,7 +40,7 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "@vendia/serverless-express": "^4.10.4",
+    "@codegenie/serverless-express": "^4.10.4",
     "adm-zip": "^0.5.10",
     "mime": "^3.0.0"
   }

@@ -1,6 +1,6 @@
 {
   "name": "nullstack-serverless",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Nullstack construct for CDK",
   "author": "mococa <luizfelipesmoureau@gmail.com>",
   "license": "MIT",
@@ -39,7 +39,7 @@
     "constructs": "^10.0.0"
   },
   "dependencies": {
-    "@vendia/serverless-express": "^4.10.4",
+    "@codegenie/serverless-express": "^4.10.4",
     "adm-zip": "^0.5.10",
     "aws-cdk-lib": "2.82.0",
     "aws-serverless-express": "^3.4.0",
