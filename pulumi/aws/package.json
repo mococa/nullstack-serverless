@@ -40,7 +40,7 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "@vendia/serverless-express": "^4.10.4",
+    "@codegenie/serverless-express": "^4.10.4",
     "adm-zip": "^0.5.10",
     "mime": "^3.0.0"
   }

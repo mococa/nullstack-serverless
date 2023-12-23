@@ -19,12 +19,12 @@ export async function compressSSRNullstackApps(app_dirs: string[]) {
     "..",
     "..",
     "..",
-    "@vendia",
+    "@codegenie",
     "serverless-express"
   );
 
   const index_js_content = [
-    'const serverless = require("@vendia/serverless-express");',
+    'const serverless = require("@codegenie/serverless-express");',
 
     'const { server } = require("./.production/server.js").default;',
 
@@ -53,7 +53,7 @@ export async function compressSSRNullstackApps(app_dirs: string[]) {
       // Adding node modules to zip
       build_zip.addLocalFolder(
         serverless_express,
-        join("node_modules", "@vendia", "serverless-express")
+        join("node_modules", "@codegenie", "serverless-express")
       );
 
       // Adding lambda entry to zip
