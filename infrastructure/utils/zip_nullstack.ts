@@ -17,7 +17,7 @@ interface ZipNullstackProps {
     build_folder?: string;
 
     /**
-     * @default path.join(__dirname, "..", "..", "node_modules", "@vendia", "serverless-express")
+     * @default path.join(__dirname, "..", "..", "node_modules", "@codegenie", "serverless-express")
      */
     serverless_express?: string;
   };
@@ -65,7 +65,7 @@ export const zip_nullstack = async (
           "..",
           "..",
           "node_modules",
-          "@vendia",
+          "@codegenie",
           "serverless-express"
         ),
     },
@@ -105,7 +105,7 @@ export const zip_nullstack = async (
     // Zipping serverless express dependency
     build_zip.addLocalFolder(
       config.paths.serverless_express,
-      path.join("node_modules", "@vendia", "serverless-express")
+      path.join("node_modules", "@codegenie", "serverless-express")
     );
 
     // Zipping lambda index.js

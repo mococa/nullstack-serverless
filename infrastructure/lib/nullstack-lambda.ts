@@ -1,4 +1,4 @@
-const serverless = require("@vendia/serverless-express");
+const serverless = require("@codegenie/serverless-express");
 const { server } = require("./.production/server").default;
 
 server.less = Boolean(process.env.LAMBDA === "true");
