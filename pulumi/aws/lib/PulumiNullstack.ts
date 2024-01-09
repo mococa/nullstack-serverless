@@ -48,6 +48,13 @@ interface Props {
    * Domain for static build types (names bucket after this)
    */
   domain?: string;
+
+  /**
+   * Removes .html from the all pages file name (except for index.html)
+   *
+   * Can be useful for s3 website routing
+   */
+  remove_dot_html?: boolean;
 }
 
 export class PulumiNullstack extends ComponentResource {
@@ -162,10 +169,26 @@ export class PulumiNullstack extends ComponentResource {
           : `public/${file.split("/").slice(1).join("/")}`
       ).replace("public/", "");
 
-      const key =
-        mode === "ssr"
-          ? ssr_key
-          : ssr_key.replace("public/", "").replace(`${mode}/`, "");
+      let key = ssr_key;
+
+      if (key !== "ssr")
+        key = ssr_key.replace("public/", "").replace(`${mode}/`, "");
+
+      let removed_dot_html = false;
+
+      // Removing .html from key if it should
+      if (
+        // only when we explicitly tells it to
+        props.remove_dot_html &&
+        // avoid index.html
+        key !== "index.html" &&
+        // only .html files in the root folder
+        /^\w+.html$/.test(key)
+      ) {
+        key = key.replace(".html", "");
+
+        removed_dot_html = true;
+      }
 
       new s3.BucketObject(
         `${name}-bucket-object-${environment}-${hex}`,
@@ -173,7 +196,9 @@ export class PulumiNullstack extends ComponentResource {
           bucket: this.bucket.id,
           key,
           source: new asset.FileAsset(resolve(nullstack_app_path, file)),
-          contentType: mime.getType(file) || undefined,
+          contentType: removed_dot_html
+            ? "text/html"
+            : mime.getType(file) || undefined,
         },
         { parent: this, dependsOn: [this.bucket_policy, this.bucket] }
       );
@@ -185,6 +210,7 @@ export class PulumiNullstack extends ComponentResource {
         {
           bucket: this.bucket.id,
           indexDocument: { suffix: "index.html" },
+          errorDocument: { key: "404" },
         },
         { dependsOn: [this.bucket, this.bucket_policy, this.access_block] }
       );
