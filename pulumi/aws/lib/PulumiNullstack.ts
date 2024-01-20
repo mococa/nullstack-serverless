@@ -3,6 +3,7 @@ import { config, iam, lambda, s3 } from "@pulumi/aws";
 import {
   ComponentResource,
   ComponentResourceOptions,
+  Input,
   asset,
   interpolate,
 } from "@pulumi/pulumi";
@@ -35,7 +36,7 @@ interface Props {
   /**
    * Nullstack application enviroment variables
    */
-  env: Record<string, string | undefined>;
+  env: Record<string, Input<string> | undefined>;
 
   /**
    * Nullstack Build mode
