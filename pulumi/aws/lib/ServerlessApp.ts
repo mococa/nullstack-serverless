@@ -36,7 +36,7 @@ interface Props {
    *
    * Example: 0000000000000000000000000000000000:certificate/000000000000000000-00000000000000000
    */
-  certificate_arn?: string;
+  certificate_arn?: pulumi.Output<string>;
 }
 
 export class ServerlessApp extends pulumi.ComponentResource {
