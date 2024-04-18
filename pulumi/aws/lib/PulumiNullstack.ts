@@ -139,7 +139,7 @@ export class PulumiNullstack extends ComponentResource {
         corsRules: [
           {
             allowedHeaders: ["*"],
-            allowedMethods: ["PUT", "POST", "DELETE"],
+            allowedMethods: ["GET"],
             allowedOrigins: ["*"],
             exposeHeaders: [],
           },
