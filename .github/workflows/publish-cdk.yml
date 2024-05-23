@@ -3,7 +3,7 @@ name: Publish to NPM
 on:
   push:
     paths:
-      - "infrastructure/package.json"
+      - "cdk/package.json"
     branches:
       - main
 
@@ -21,15 +21,15 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install CDK Dependencies
-        working-directory: infrastructure
+        working-directory: cdk
         run: yarn install
 
       - name: Build CDK package
-        working-directory: infrastructure
+        working-directory: cdk
         run: yarn run build
 
       - name: Publish CDK package on NPM
-        working-directory: infrastructure
+        working-directory: cdk
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
