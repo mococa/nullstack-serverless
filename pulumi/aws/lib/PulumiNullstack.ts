@@ -14,7 +14,7 @@ import { existsSync } from "fs";
 import * as mime from "mime";
 
 /* ---------- Interfaces ---------- */
-interface Props {
+export interface PulumiNullstackProps {
   /**
    * Built Nullstack application SSG directory
    *
@@ -71,7 +71,7 @@ export class PulumiNullstack extends ComponentResource {
 
   public constructor(
     name: string,
-    props: Props,
+    props: PulumiNullstackProps,
     opts?: ComponentResourceOptions
   ) {
     super(`nullstack-sls:nullstack-app:${name}`, name, {}, opts);
@@ -213,7 +213,7 @@ export class PulumiNullstack extends ComponentResource {
           indexDocument: { suffix: "index.html" },
           errorDocument: { key: "404" },
         },
-        { dependsOn: [this.bucket, this.bucket_policy, this.access_block] }
+        { parent: this, dependsOn: [this.bucket, this.bucket_policy, this.access_block] }
       );
 
       return;

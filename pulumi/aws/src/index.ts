@@ -1,5 +1,5 @@
 import { compressSSRNullstackApps } from "../lib/compressNullstackApps";
-import { PulumiNullstack } from "../lib/PulumiNullstack";
-import { ServerlessApp } from "../lib/ServerlessApp";
+import { PulumiNullstack, PulumiNullstackProps } from "../lib/PulumiNullstack";
+import { ServerlessApp, ServerlessAppProps } from "../lib/ServerlessApp";
 
-export { PulumiNullstack, ServerlessApp, compressSSRNullstackApps };
+export { PulumiNullstack, PulumiNullstackProps, ServerlessApp, ServerlessAppProps, compressSSRNullstackApps };

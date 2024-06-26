@@ -3,7 +3,7 @@ import * as pulumi from "@pulumi/pulumi";
 import { getRegion, apigatewayv2, lambda } from "@pulumi/aws";
 
 /* ---------- Interfaces ---------- */
-interface Props {
+export interface ServerlessAppProps {
   /**
    * Lambda function that will be proxied in ApiGateway
    *
@@ -48,7 +48,7 @@ export class ServerlessApp extends pulumi.ComponentResource {
   apigateway_domain_name: apigatewayv2.DomainName | undefined;
   apigateway_hostname: pulumi.Output<string>;
 
-  constructor(name: string, props: Props, opts?: pulumi.ResourceOptions) {
+  constructor(name: string, props: ServerlessAppProps, opts?: pulumi.ResourceOptions) {
     super(`lambda-express:serverless-app:${name}`, name, {}, opts);
 
     if (!props.lambda_fn) throw new Error("Missing lambda function");
