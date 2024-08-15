@@ -17,8 +17,7 @@ export async function compressSSRNullstackApps(app_dirs: string[]) {
   const serverless_express = join(
     __dirname,
     "..",
-    "..",
-    "..",
+    "pkg",
     "@codegenie",
     "serverless-express"
   );
@@ -43,9 +42,12 @@ export async function compressSSRNullstackApps(app_dirs: string[]) {
       // Creating zip
       const build_zip = new AdmZip();
 
+      const files = /(client\.(js|css))|(server\.js)/g
+
       // Adding .production folder to zip
-      if (existsSync(join(app_dir, ".production")))
-        build_zip.addLocalFolder(join(app_dir, ".production"), ".production");
+      if (existsSync(join(app_dir, ".production"))) {
+        build_zip.addLocalFolder(join(app_dir, ".production"), ".production", files)
+      }
 
       // Adding public folder to zip
       build_zip.addLocalFolder(join(app_dir, "public"), "public");
