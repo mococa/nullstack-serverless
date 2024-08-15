@@ -4,13 +4,13 @@
     "baseUrl": ".",
     "module": "commonjs",
     "lib": ["es2020", "dom"],
-    "declaration": true,
+    "declaration": false,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noImplicitThis": true,
     "skipLibCheck": true,
-    "alwaysStrict": true,
+    "alwaysStrict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
@@ -22,7 +22,8 @@
     "esModuleInterop": true,
     "typeRoots": ["./node_modules/@types"],
     "noEmit": false,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "allowJs": true
   },
   "exclude": ["node_modules", "dist"]
 }
