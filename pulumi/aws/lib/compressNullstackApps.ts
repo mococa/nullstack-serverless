@@ -61,7 +61,7 @@ export async function compressSSRNullstackApps(app_dirs: string[]): Promise<bool
 
         // Writing zip
         return new Promise<boolean>((resolve, reject) => {
-          build_zip.writeZip(join(build_folder, "build.zip"), (err: string) => {
+          build_zip.writeZip(join(build_folder, "build.zip"), (err: Error | null) => {
             if (err) return reject(err);
 
             resolve(true);
