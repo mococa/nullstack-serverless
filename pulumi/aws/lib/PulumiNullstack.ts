@@ -266,7 +266,7 @@ export class PulumiNullstack extends ComponentResource {
         role: this.lambda_fn_role.arn,
         handler: "index.handler",
         memorySize: 512,
-        runtime: "nodejs18.x",
+        runtime: "nodejs20.x",
         timeout: 10,
         environment: {
           variables: {
